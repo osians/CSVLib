@@ -13,10 +13,10 @@ Comece por inserir a biblioteca e instanciar a classe usando o seguinte código:
 
 ```php
 # Incluindo a biblioteca CSV
-require_once './lib/ARQUIVOS/csv.class.php' ; 
+require_once __DIR__ .'/src/CsvReader.php'; 
 
 # Instanciando o Objeto de Manipulação de dados
-$csv = new \ARQUIVOS\Csv( 'movimentos_financeiros.csv',',','"' );
+$csv = new CsvReader( 'movimentos_financeiros.csv',',','"' );
 
 ```
 
@@ -29,14 +29,14 @@ caso não passe os 2 últimos parametros, a biblioteca irá considerar como padr
 
 ### Leitura de dados
 
-A leitura de dados é realizada com o método `ler()` da classe `Csv`.
+A leitura de dados é realizada com o método `read()` da classe `CsvReader`.
 Esse método, também pode receber os 3 parametros citado acima.
 
 ```php
 
 # obtendo os dados e realizando um Loop
 # com foreach
-foreach( $csv->ler() as $linha )
+foreach( $csv->read() as $linha )
     var_dump( $linha );
 
 ```
@@ -102,5 +102,4 @@ foreach( $csv->ler() as $linha ){
 Espero que essa simples classe possa ser de alguma ajuda a quem a utilizar. Caso, necessite mais detalhes, sinta-se a vontade para acessar o site http://sooho.com.br pois contém um material mais detalhado sobre como a biblioteca foi elaborada.
 
 Obrigado.
-sem mais, 
 Wanderlei Santana <sans.pds@gmail.com>

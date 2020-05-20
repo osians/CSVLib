@@ -6,14 +6,15 @@
 header('Content-Type: text/html; charset=utf-8');
 
 # 1. Incluindo a biblioteca CSV
-require_once './lib/ARQUIVOS/csv.class.php' ; 
+require_once __DIR__ .'/src/CsvReader.php'; 
 
 # 2. Instanciando o Objeto de Manipulação de dados
-$csv = new \ARQUIVOS\Csv( 'movimentos_financeiros.csv',',','"' );
+$csv = new CsvReader('movimentos_financeiros.csv', ',', '"');
 
 # 3. Obtendo os resultados
-foreach( $csv->ler() as $linha )
-    var_dump( $linha );
+foreach ($csv->read() as $linha) {
+    var_dump($linha);
+}
 
 
 /**
@@ -28,19 +29,20 @@ die();
  * ----------------------------------------
  */
 # metodo 01
-$csv = new \ARQUIVOS\Csv();
-$csv->setArquivo( 'meu_arquivo.csv' );
-$csv->setDelimitador( ';' );
-$dados = $csv->ler();
+$csv = new CsvReader();
+$csv->setFilePath('meu_arquivo.csv');
+$csv->setDelimitador(';');
+$dados = $csv->read();
 
 # metodo 02
-$csv = new \ARQUIVOS\Csv( 'teste_importe__.csv', ';' );
-$dados = $csv->ler();
+$csv = new CsvReader('meu_arquivo.csv', ';');
+$dados = $csv->read();
 
 #metodo 03
-$csv = new \ARQUIVOS\Csv();
-foreach( $csv->ler( 'teste_importe__.csv' ) as $linha )
+$csv = new CsvReader();
+foreach ($csv->read('meu_arquivo.csv') as $linha ) {
     echo $linha['id_cliente'];
+}
 
 
 /**
@@ -87,7 +89,7 @@ echo $csv->dataAcesso() . "<br>";
  * confortavel o uso de oop.
  * A conversão funciona pelo proprio PHP via typecast.
  */
-foreach( $csv->ler() as $linha ){
+foreach ($csv->ler() as $linha) {
     $linha = (object) $linha;
     var_dump( $linha );
 }
