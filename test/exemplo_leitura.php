@@ -6,14 +6,21 @@
 header('Content-Type: text/html; charset=utf-8');
 
 # 1. Incluindo a biblioteca CSV
-require_once __DIR__ .'/src/CsvReader.php'; 
+require_once __DIR__ . '/../src/CsvReader.php'; 
 
 # 2. Instanciando o Objeto de Manipulação de dados
 $csv = new CsvReader('movimentos_financeiros.csv', ',', '"');
 
 # 3. Obtendo os resultados
-foreach ($csv->read() as $linha) {
-    var_dump($linha);
+foreach ($csv->read() as $row) {
+    echo "ID Movimento: " . $row['idmovimento'] . PHP_EOL;
+    echo "ID Usuario :" . $row['idusuario'] . PHP_EOL;
+    echo "Data: " . $row['data'] . PHP_EOL;
+    echo "Valor: " . $row['valor'] . PHP_EOL;
+    echo "Liquidado: " . $row['liquidado'] . PHP_EOL;
+    echo "Descrição: " . $row['descricao'] . PHP_EOL;
+    echo "ID Categoria: " . $row['idcategoria'] . PHP_EOL;
+    echo "Status: " . $row['status'] . PHP_EOL . PHP_EOL;
 }
 
 

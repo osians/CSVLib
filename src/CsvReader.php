@@ -57,11 +57,18 @@ class CsvReader extends FileManager
      */
     function __construct($arquivo = null, $delimitador = null, $enclosure = null)
     {
-        parent::__construct($arquivo);
-        $this->setDelimitador($delimitador);
-        $this->setEnclosure($enclosure);
+        parent::__construct();
+        $this->_inicializarArquivo($arquivo, $delimitador, $enclosure);
     }
 
+    /**
+     * Seta o caractere que delimita os campos do arquivo CSV.
+     * Os mais comuns são ";" e ",".
+     * 
+     * @param String $delimiter
+     *
+     * @return CsvReader
+     */
     public function setDelimitador($delimiter = null)
     {
         if ($delimiter == null) {
@@ -72,11 +79,23 @@ class CsvReader extends FileManager
         return $this;
     }
 
+    /**
+     * Retorna o caracter delimitador do arquivo CSV
+     *
+     * @return String
+     */
     public function getDelimitador()
     {
         return $this->_delimitador;
     }
     
+    /**
+     * Seta o caractere que delimita um campo do tipo texto
+     *
+     * @param String $value - normalmente " ou '
+     *
+     * @return CsvReader
+     */
     public function setEnclosure($value = null)
     {
         if ($value == null) {
@@ -88,6 +107,39 @@ class CsvReader extends FileManager
     }
 
     /**
+     * retornar o caracter de Enclosure de Texto
+     *
+     * @return String
+     */
+    public function getEnclosure()
+    {
+        return $this->_enclosure;
+    }
+    
+    /**
+     * Seta os Indices ou Colunas da tabela CSV
+     *
+     * @param Array $indices
+     *
+     * @return CsvReader
+     */
+    public function setIndices($indices = array())
+    {
+        $this->_indices = $indices;
+        return $this;
+    }
+    
+    /**
+     * Retorna Array com os nomes das Colunas do arquivo CSV
+     *
+     * @return Array
+     */
+    public function getIndices()
+    {
+        return $this->_indices;
+    }
+    
+    /**
      * Funcao responsavel por processar todas
      * as linhas do arquivo CSV e retornar
      * os dados em forma de Array
@@ -98,31 +150,21 @@ class CsvReader extends FileManager
      * @param char $enclosure - caracter de scape para strings
      *
      * @return array - linhas do arquivo
+     * 
+     * @throws Exception
      */
     public function read($arquivo = null , $delimitador = null, $enclosure = null)
     {
-        if ($arquivo != null) {
-            parent::setFilePath($arquivo);
-        }
-
-        if ($delimitador != null) {
-            $this->setDelimitador($delimitador);
-        }
-		
-        if ($enclosure != null) {
-            $this->setEnclosure($enclosure);
-        }
-
-        $retorno = array();
-
+        $this->_inicializarArquivo($arquivo, $delimitador, $enclosure);
         parent::open();
 
+        $retorno = array();
         $firstLine = true;
 
         while (($row = fgetcsv(parent::getFilePointer(), 1024, "\\")) !== false) {
             $this->_numRows++;
 
-            $linha = str_getcsv( $row[0], $this->getDelimitador(), $this->_enclosure );
+            $linha = str_getcsv($row[0], $this->getDelimitador(), $this->getEnclosure());
 
             if ($firstLine) {
                 $this->_tratarPrimeiraLinhaDoArquivo($linha);
@@ -136,16 +178,42 @@ class CsvReader extends FileManager
             # acessados com $csv['nome'], $csv['sobrenome'] ao
             # invés de usar $csv[0], $csv[6]
             try {
-                $retorno[] = array_combine($this->_indices, $linha);
-            } catch (CsvException $e) {
-                throw new CsvException( 
-                    "Existe um erro de lógica na formação do conteudo CSV", $e->getCode());
+                $retorno[] = array_combine($this->getIndices(), $linha);
+            } catch (Exception $e) {
+                throw new Exception( 
+                    "Erro de lógica na formação do conteudo CSV", $e->getCode());
             }
         }
 
         return $retorno;
     }
 
+    /**
+     * Metodo usado para inicializar o arquivo CSV atraves da classe parent
+     *
+     * @param String $arquivo
+     * @param string $delimitador
+     * @param String $enclosure
+     *
+     * @return CsvReader
+     */
+    private function _inicializarArquivo($arquivo = null , $delimitador = null, $enclosure = null)
+    {
+        if ($arquivo != null) {
+            parent::setFilePath($arquivo);
+        }
+
+        if ($delimitador != null) {
+            $this->setDelimitador($delimitador);
+        }
+		
+        if ($enclosure != null) {
+            $this->setEnclosure($enclosure);
+        }
+        
+        return $this;
+    }
+    
     /**
      * trata a primeira linha do arquivo CSV, tornando esta as colunas
      * ou indices do arquivo.
@@ -168,7 +236,7 @@ class CsvReader extends FileManager
 
         # preenche a variavel indices com os nomes localizados na primeira
         # linha do arquivo CSV
-        $this->_indices = $linha;
+        $this->setIndices($linha);
 
         return $this;
     }
